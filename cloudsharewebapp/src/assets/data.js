@@ -64,7 +64,7 @@ export const pricingPlans = [
   },
   {
     name: "프리미엄",
-    price: "500",
+    price: "5,000",
     description: "더 많은 기능이 필요한 개인을 위한 플랜",
     features: [
       "파일 업로드 500개",
@@ -78,7 +78,7 @@ export const pricingPlans = [
   },
   {
     name: "얼티밋",
-    price: "2500",
+    price: "10,000",
     description: "팀과 비즈니스를 위한 플랜",
     features: [
       "파일 업로드 5000개",
