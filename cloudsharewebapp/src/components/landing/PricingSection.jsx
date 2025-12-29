@@ -41,7 +41,11 @@ const PricingSection = ({ pricingPlans }) => {
                   )}
                 </div>
                 <p className="mt-4 text-sm text-gray-500">{plan.description}</p>
-                <p className="mt-8">{plan.price}원</p>
+                <p className="mt-8">
+                  <span className="text-4xl font-extrabold text-gray-900">
+                    {plan.price}원
+                  </span>
+                </p>
               </div>
               <div className="flex-1 flex flex-col justify-between px-6 pt-6 pb-8 bg-gray-50 space-y-6">
                 <ul className="space-y-4">
