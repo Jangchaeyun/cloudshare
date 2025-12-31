@@ -18,7 +18,7 @@ const Landing = () => {
     if (isSignedIn) {
       navigate("/dashboard");
     }
-  }, [isSignedIn, naviage]);
+  }, [isSignedIn, navigate]);
   return (
     <div className="landing-page bg-gradient-to-b from-gray-50to-gray-100">
       {/* Hero Section */}
@@ -26,7 +26,7 @@ const Landing = () => {
       {/* Feature section */}
       <FeaturesSection features={features} />
       {/* Pricing section */}
-      <PricingSection pricingPlans={pricingPlans} />
+      <PricingSection pricingPlans={pricingPlans} openSignUp={openSignUp} />
       {/* Testimonials section */}
       <TestimonialsSection />
       {/* CTA section */}

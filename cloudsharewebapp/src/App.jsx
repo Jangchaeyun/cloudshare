@@ -1,16 +1,11 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Landing from "./pages/Landing";
-import Dashboard from "./pages/Dasbboard";
+import Dashboard from "./pages/Dashboard";
 import Upload from "./pages/Upload";
 import MyFiles from "./pages/MyFiles";
 import Subscription from "./pages/Subscription";
 import Transactions from "./pages/Transactions";
-import {
-  RedirectToSignIn,
-  SignedIn,
-  SignedOut,
-  SignIn,
-} from "@clerk/clerk-react";
+import { RedirectToSignIn, SignedIn, SignedOut } from "@clerk/clerk-react";
 
 const App = () => {
   return (
@@ -18,7 +13,7 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Landing />} />
         <Route
-          path="/dasboard"
+          path="/dashboard"
           element={
             <>
               <SignedIn>
@@ -30,10 +25,59 @@ const App = () => {
             </>
           }
         />
-        <Route path="/upload" element={<Upload />} />
-        <Route path="/my-files" element={<MyFiles />} />
-        <Route path="/subscriptions" element={<Subscription />} />
-        <Route path="transactions" element={<Transactions />} />
+        <Route
+          path="/upload"
+          element={
+            <>
+              <SignedIn>
+                <Upload />
+              </SignedIn>
+              <SignedOut>
+                <RedirectToSignIn />
+              </SignedOut>
+            </>
+          }
+        />
+        <Route
+          path="/my-files"
+          element={
+            <>
+              <SignedIn>
+                <MyFiles />
+              </SignedIn>
+              <SignedOut>
+                <RedirectToSignIn />
+              </SignedOut>
+            </>
+          }
+        />
+        <Route
+          path="/subscriptions"
+          element={
+            <>
+              <SignedIn>
+                <Subscription />
+              </SignedIn>
+              <SignedOut>
+                <RedirectToSignIn />
+              </SignedOut>
+            </>
+          }
+        />
+        <Route
+          path="transactions"
+          element={
+            <>
+              <SignedIn>
+                <Transactions />
+              </SignedIn>
+              <SignedOut>
+                <RedirectToSignIn />
+              </SignedOut>
+            </>
+          }
+        />
+        <Route path="/*" element={<RedirectToSignIn />} />
       </Routes>
     </BrowserRouter>
   );
