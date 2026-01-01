@@ -1,5 +1,5 @@
 import { useClerk, useUser } from "@clerk/clerk-react";
-import { features, pricingPlans } from "../assets/data";
+import { features, pricingPlans, testimonials } from "../assets/data";
 import CTASection from "../components/landing/CTASection";
 import FeaturesSection from "../components/landing/FeaturesSection";
 import FooterSection from "../components/landing/FooterSection";
@@ -28,9 +28,9 @@ const Landing = () => {
       {/* Pricing section */}
       <PricingSection pricingPlans={pricingPlans} openSignUp={openSignUp} />
       {/* Testimonials section */}
-      <TestimonialsSection />
+      <TestimonialsSection testmonials={testimonials} />
       {/* CTA section */}
-      <CTASection />
+      <CTASection openSignUp={openSignUp} />
       {/* Footer section */}
       <FooterSection />
     </div>
