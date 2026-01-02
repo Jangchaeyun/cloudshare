@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import com.cherry.cloudshareapi.document.ProfileDocument;
 import com.cherry.cloudshareapi.dto.ProfileDTO;
 import com.cherry.cloudshareapi.repository.ProfileRepository;
+import com.mongodb.DuplicateKeyException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -27,9 +28,13 @@ public class ProfileService {
 			.createdAt(Instant.now())
 			.build();
 		
-		profile = profileRepository.save(profile);
+		try {
+			profile = profileRepository.save(profile);
+		} catch (DuplicateKeyException e) {
+			throw new RuntimeException("Email already exists");
+		}
 		
-		ProfileDTO.builder()
+		return ProfileDTO.builder()
 			.id(profile.getId())
 			.clerkId(profile.getClerkId())
 			.email(profile.getEmail())
