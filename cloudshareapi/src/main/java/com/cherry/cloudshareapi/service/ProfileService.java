@@ -2,12 +2,12 @@ package com.cherry.cloudshareapi.service;
 
 import java.time.Instant;
 
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
 import com.cherry.cloudshareapi.document.ProfileDocument;
 import com.cherry.cloudshareapi.dto.ProfileDTO;
 import com.cherry.cloudshareapi.repository.ProfileRepository;
-import com.mongodb.DuplicateKeyException;
 
 import lombok.RequiredArgsConstructor;
 
