@@ -1,7 +1,12 @@
 package com.cherry.cloudshareapi.security;
 
+import java.awt.RenderingHints.Key;
+import java.math.BigInteger;
 import java.net.URL;
+import java.security.KeyFactory;
 import java.security.PublicKey;
+import java.security.spec.RSAPublicKeySpec;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,7 +42,30 @@ public class ClerkJwksProvider {
 		JsonNode keys = jwks.get("keys");
 		
 		for (JsonNode keyNode: keys) {
-			keyNode.get(0)
+			String kid = keyNode.get("kid").asText();
+			String kty = keyNode.get("kty").asText();
+			String alg = keyNode.get("alg").asText();
+			
+			if("RSA".equals(kty) && "RS256".equals(alg)) {
+				String n = keyNode.get("n").asText();
+				String e = keyNode.get("e").asText();
+				
+				PublicKey publicKey = createPublicKey(n, e);
+				keyCache.put(kid, publicKey);
+			}
 		}
+		lastFetchTime = System.currentTimeMillis();
+	}
+
+	private PublicKey createPublicKey(String modulus, String exponent) throws Exception {
+		byte[] modulusBytes = Base64.getUrlDecoder().decode(modulus);
+		byte[] exponentBytes = Base64.getUrlDecoder().decode(exponent);
+		
+		BigInteger modulusBigInt = new BigInteger(1, modulusBytes);
+		BigInteger exponentBigInt = new BigInteger(1, exponentBytes);
+		
+		RSAPublicKeySpec spec = new RSAPublicKeySpec(modulusBigInt, exponentBigInt);
+		KeyFactory factory = KeyFactory.getInstance("RSA");
+		return factory.generatePublic(spec);
 	}
 }
