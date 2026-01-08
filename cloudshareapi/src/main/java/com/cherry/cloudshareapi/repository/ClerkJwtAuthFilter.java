@@ -84,12 +84,11 @@ public class ClerkJwtAuthFilter extends OncePerRequestFilter {
 			UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(clerkId, null, Collections.singletonList(new SimpleGrantedAuthority("ROLE_ADMIN")));
 			
 			SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+			filterChain.doFilter(request, response);
 		} catch (Exception e) {
-			throw new RuntimeException();
-		}
+			response.sendError(HttpServletResponse.SC_FORBIDDEN, "Invalid JWT token: " + e.getMessage());
+			return;
+		}		
 		
-		filterChain.doFilter(request, response);
 	}
-	
-	
 }
