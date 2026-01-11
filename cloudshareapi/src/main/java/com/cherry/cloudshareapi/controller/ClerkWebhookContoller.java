@@ -12,6 +12,7 @@ import org.springframework.web.server.ResponseStatusException;
 import com.cherry.cloudshareapi.CloudshareapiApplication;
 import com.cherry.cloudshareapi.dto.ProfileDTO;
 import com.cherry.cloudshareapi.service.ProfileService;
+import com.cherry.cloudshareapi.service.UserCreditsService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -30,6 +31,7 @@ public class ClerkWebhookContoller {
 	private String webhookSecret;
 	
 	private final ProfileService profileService;
+	private final UserCreditsService userCreditsService;
 
 	@PostMapping("/clerk")
 	public ResponseEntity<?> handleClerkWebhook(@RequestHeader("svix-id") String svixId, @RequestHeader("svix-timestamp") String svixTimestamp, @RequestHeader("svix-signature") String svixSignature, @RequestHeader String payload) {
@@ -116,6 +118,7 @@ public class ClerkWebhookContoller {
 			.build();
 		
 		profileService.createProfile(newProfile);
+		userCreditsService.createInitialCredits(clerkId);
 	}
 
 	private boolean verifyWebhookSignature(String svixId, String svixTimestamp, String svixSignature, String payload) {
