@@ -1,10 +1,13 @@
 import { UserButton } from "@clerk/clerk-react";
+import DashboardLayout from "../layout/DashboardLayout";
 
 const Dashboard = () => {
   return (
-    <div>
-      <UserButton />
-    </div>
+    <DashboardLayout>
+      <div>
+        <UserButton />
+      </div>
+    </DashboardLayout>
   );
 };
 

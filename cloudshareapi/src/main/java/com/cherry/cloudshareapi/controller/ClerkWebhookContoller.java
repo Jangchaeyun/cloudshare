@@ -23,10 +23,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ClerkWebhookContoller {
 
-    private final CloudshareapiApplication cloudshareapiApplication;
-
-    private final CorsFilter corsFilter;
-	
 	@Value("${clerk.webhook.secret}")
 	private String webhookSecret;
 	
