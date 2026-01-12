@@ -4,9 +4,7 @@ import DashboardLayout from "../layout/DashboardLayout";
 const Dashboard = () => {
   return (
     <DashboardLayout>
-      <div>
-        <UserButton />
-      </div>
+      <div>Dashboard content</div>
     </DashboardLayout>
   );
 };
