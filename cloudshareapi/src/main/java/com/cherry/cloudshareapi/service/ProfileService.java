@@ -3,6 +3,8 @@ package com.cherry.cloudshareapi.service;
 import java.time.Instant;
 
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.cherry.cloudshareapi.document.ProfileDocument;
@@ -92,5 +94,14 @@ public class ProfileService {
 		if (existingProfile != null) {
 			profileRepository.delete(existingProfile);
 		}
+	}
+	
+	public ProfileDocument getCurrentProfile() {
+		if (SecurityContextHolder.getContext().getAuthentication() == null) {
+			throw new UsernameNotFoundException("User not authenticated");
+		}
+		
+		String clerkId = SecurityContextHolder.getContext().getAuthentication().getName();
+		return profileRepository.findByClerkId(clerkId);
 	}
 }
