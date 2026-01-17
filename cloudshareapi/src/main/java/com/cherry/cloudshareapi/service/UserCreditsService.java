@@ -39,4 +39,15 @@ public class UserCreditsService {
 		UserCredits userCredits = getUserCredits();
 		return userCredits.getCredits() >= requiredCredits;
 	}
+	
+	public UserCredits consumeCredit() {
+	 	UserCredits userCredits = getUserCredits();
+	 	
+	 	if (userCredits.getCredits() <= 0) {
+	 		return null;
+	 	}
+	 	
+	 	userCredits.setCredits(userCredits.getCredits() - 1);
+	 	return userCreditsRepository.save(userCredits);
+	}
 }
