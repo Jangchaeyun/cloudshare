@@ -7,7 +7,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import com.cherry.cloudshareapi.document.FileMetadataDocument;
 
 public interface FileMetadataRepository extends MongoRepository<FileMetadataDocument, String>{
- 	List<FileMetadataDocument> findByClerkId(String clerkId);
- 	
- 	Long countByClerkId(String clerkId);
+	List<FileMetadataDocument> findByClerkId(String clerkId);
+
+    Long countByClerkId(String clerkId);
 }

@@ -16,13 +16,14 @@ import lombok.NoArgsConstructor;
 @Builder
 @Data
 public class FileMetadataDocument {
-	@Id
-	private String id;
-	private String name;
-	private String type;
-	private Long size;
-	private String clerkId;
-	private Boolean isPublic;
-	private String fileLocation;
-	private LocalDateTime uploadedAt;
+
+    @Id
+    private String id;
+    private String name;
+    private String type;
+    private Long size;
+    private String clerkId;
+    private Boolean isPublic;
+    private String fileLocation;
+    private LocalDateTime uploadedAt;
 }

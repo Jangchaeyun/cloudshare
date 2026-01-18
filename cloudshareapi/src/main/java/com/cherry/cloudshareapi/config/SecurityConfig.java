@@ -23,36 +23,33 @@ import lombok.RequiredArgsConstructor;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-	
-	private final ClerkJwtAuthFilter clerkJwtAuthFilter;
-	
-	@Bean
-	public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-		httpSecurity.cors(Customizer.withDefaults())
-			.csrf(AbstractHttpConfigurer::disable)
-			.authorizeHttpRequests(auth -> auth.requestMatchers("/webhooks/**").permitAll().anyRequest().authenticated())
-			.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-			.addFilterBefore(clerkJwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
-		
-		return httpSecurity.build();
-	}
-	
-	
-	@Bean
-	public CorsFilter corsFilter() {
-		return new CorsFilter(corsConfigurationSource());
-	}
-	
-	private UrlBasedCorsConfigurationSource corsConfigurationSource() {
-		CorsConfiguration config = new CorsConfiguration();
-		config.setAllowedOrigins(List.of("*"));
-		config.setAllowedHeaders(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTION"));
-		config.setAllowedHeaders(List.of("Authorization", "Content-Type"));
-		config.setAllowCredentials(true);
-		
-		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-		source.registerCorsConfiguration("/**", config);
-		return source;
-	}
-	
+
+    private final ClerkJwtAuthFilter clerkJwtAuthFilter;
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+        httpSecurity.cors(Customizer.withDefaults())
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(auth -> auth.requestMatchers("/webhooks/**", "/files/public/**", "/files/download/**", "/health").permitAll().anyRequest().authenticated())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(clerkJwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+        return httpSecurity.build();
+    }
+
+    @Bean
+    public CorsFilter corsFilter() {
+        return new CorsFilter(corsConfigurationSource());
+    }
+
+    private UrlBasedCorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOriginPatterns(List.of("*"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+        config.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+        config.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
+    }
 }
