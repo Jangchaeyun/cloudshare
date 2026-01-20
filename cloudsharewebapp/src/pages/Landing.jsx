@@ -1,5 +1,28 @@
+import { features } from "../assets/data";
+import CTASection from "../components/landing/CTASection";
+import FeaturesSection from "../components/landing/FeaturesSection";
+import Footer from "../components/landing/Footer";
+import HeroSection from "../components/landing/HeroSection";
+import PricingSection from "../components/landing/PricingSection";
+import TestimonialsSection from "../components/landing/TestimonialsSection";
+
 const Landing = () => {
-  return <div>Landing</div>;
+  return (
+    <div className="landing-page bg-gradient-to-b from-gray-50 to-gray-100">
+      {/* Hero Section */}
+      <HeroSection />
+      {/* Features Section */}
+      <FeaturesSection features={features} />
+      {/* Pricing Section */}
+      <PricingSection />
+      {/* Testimonials Section */}
+      <TestimonialsSection />
+      {/* CTA Section */}
+      <CTASection />
+      {/* Footer Section */}
+      <Footer />
+    </div>
+  );
 };
 
 export default Landing;
