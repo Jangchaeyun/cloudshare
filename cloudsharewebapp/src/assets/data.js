@@ -51,7 +51,7 @@ export const features = [
 export const pricingPlans = [
   {
     name: "무료",
-    price: "₩0",
+    price: "0원",
     description: "시작하기에 적합한 플랜",
     features: [
       "파일 업로드 5회",
@@ -64,7 +64,7 @@ export const pricingPlans = [
   },
   {
     name: "프리미엄",
-    price: "₩25,000",
+    price: "25,000원",
     description: "개인 사용자를 위한 확장된 플랜",
     features: [
       "파일 업로드 500회",
@@ -78,7 +78,7 @@ export const pricingPlans = [
   },
   {
     name: "얼티밋",
-    price: "₩35,000",
+    price: "35,000원",
     description: "팀과 기업을 위한 플랜",
     features: [
       "파일 업로드 5,000회",
