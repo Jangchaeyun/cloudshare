@@ -9,4 +9,6 @@ public interface ProfileRepository extends MongoRepository<ProfileDocument, Stri
     Optional<ProfileDocument> findByEmail(String email);
 
     ProfileDocument findByClerkId(String clerkId);
+
+    Boolean existsByClerkId(String clerkId);
 }

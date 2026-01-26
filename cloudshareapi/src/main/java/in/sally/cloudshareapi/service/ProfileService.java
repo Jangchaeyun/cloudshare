@@ -16,6 +16,10 @@ public class ProfileService {
     private final ProfileRepository profileRepository;
 
     public ProfileDTO createProfile(ProfileDTO profileDTO) {
+        if (profileRepository.existsByClerkId(profileDTO.getClerkId())) {
+           return updateProfile(profileDTO);
+        }
+
         ProfileDocument profile = ProfileDocument.builder()
                 .clerkId(profileDTO.getClerkId())
                 .email(profileDTO.getEmail())
@@ -51,6 +55,40 @@ public class ProfileService {
             if (profileDTO.getFirstName() != null && profileDTO.getFirstName().isEmpty()) {
                 existingProfile.setFirstName(profileDTO.getFirstName());
             }
+
+            if (profileDTO.getLastName() != null && profileDTO.getLastName().isEmpty()) {
+                existingProfile.setLastName(profileDTO.getLastName());
+            }
+
+            if (profileDTO.getPhotoUrl() != null && profileDTO.getPhotoUrl().isEmpty()) {
+                existingProfile.setPhotoUrl(profileDTO.getPhotoUrl());
+            }
+
+            profileRepository.save(existingProfile);
+
+            ProfileDTO.builder()
+                    .id(existingProfile.getId())
+                    .clerkId(existingProfile.getClerkId())
+                    .email(existingProfile.getEmail())
+                    .firstName(existingProfile.getFirstName())
+                    .lastName(existingProfile.getLastName())
+                    .photoUrl(existingProfile.getPhotoUrl())
+                    .credits(existingProfile.getCredits())
+                    .createdAt(existingProfile.getCreatedAt())
+                    .build();
+        }
+        return null;
+    }
+
+    public boolean existsByClerkId(String clerkId) {
+        return profileRepository.existsByClerkId(clerkId);
+    }
+
+    public void deleteProfile(String clerkId) {
+        ProfileDocument existingProfile = profileRepository.findByClerkId(clerkId);
+
+        if (existingProfile != null) {
+            profileRepository.delete(existingProfile);
         }
     }
 }
