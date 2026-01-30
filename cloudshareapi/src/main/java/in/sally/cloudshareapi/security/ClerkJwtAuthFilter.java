@@ -25,16 +25,25 @@ import java.util.Collections;
 @RequiredArgsConstructor
 public class ClerkJwtAuthFilter extends OncePerRequestFilter {
 
-    @Value( "${clerk.issuer}")
+    @Value("${clerk.issuer}")
     private String clerkIssuer;
 
-    private final ClerkJwksProvider clerkJwksProvider;
+    private final ClerkJwksProvider jwksProvider;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        if (request.getRequestURI().contains("/webhooks")) {
-            filterChain.doFilter(request, response);
-        }
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        return request.getRequestURI().startsWith("/api/v1.0/webhooks/")
+                || request.getRequestURI().startsWith("/api/v1.0/public")
+                || request.getRequestURI().startsWith("/api/v1.0/download")
+                || request.getRequestURI().startsWith("/api/v1.0/health");
+    }
+
+    @Override
+    protected void doFilterInternal(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            FilterChain filterChain
+    ) throws ServletException, IOException {
 
         String authHeader = request.getHeader("Authorization");
 
@@ -46,7 +55,6 @@ public class ClerkJwtAuthFilter extends OncePerRequestFilter {
         try {
             String token = authHeader.substring(7);
             String[] chunks = token.split("\\.");
-
             if (chunks.length < 3) {
                 response.sendError(HttpServletResponse.SC_FORBIDDEN, "Invalid JWT token format");
                 return;
@@ -56,34 +64,31 @@ public class ClerkJwtAuthFilter extends OncePerRequestFilter {
             ObjectMapper mapper = new ObjectMapper();
             JsonNode headerNode = mapper.readTree(headerJson);
 
-            if (!headerNode.has("kid")) {
-                response.sendError(HttpServletResponse.SC_FORBIDDEN, "Token header is missing kid");
-                return;
-            }
-
             String kid = headerNode.get("kid").asText();
+            PublicKey publicKey = jwksProvider.getPublicKey(kid);
 
-            PublicKey publicKey = clerkJwksProvider.getPublicKey(kid);
-
-            // verify the token
             Claims claims = Jwts.parserBuilder()
                     .setSigningKey(publicKey)
-                    .setAllowedClockSkewSeconds(60)
                     .requireIssuer(clerkIssuer)
+                    .setAllowedClockSkewSeconds(60)
                     .build()
                     .parseClaimsJws(token)
                     .getBody();
 
             String clerkId = claims.getSubject();
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(clerkId, null, Collections.singletonList(new SimpleGrantedAuthority("ROLE_ADMIN")));
 
-            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+            UsernamePasswordAuthenticationToken authentication =
+                    new UsernamePasswordAuthenticationToken(
+                            clerkId,
+                            null,
+                            Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))
+                    );
+
+            SecurityContextHolder.getContext().setAuthentication(authentication);
             filterChain.doFilter(request, response);
-        } catch (Exception e) {
-            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Invalid JWT token: " + e.getMessage());
-            return;
-        }
 
-        filterChain.doFilter(request, response);
+        } catch (Exception e) {
+            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Invalid JWT token");
+        }
     }
 }

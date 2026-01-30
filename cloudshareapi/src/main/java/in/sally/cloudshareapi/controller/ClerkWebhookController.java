@@ -28,10 +28,11 @@ public class ClerkWebhookController {
                                                 @RequestHeader("svix-signature") String svixSignature,
                                                 @RequestBody String payload) {
         try {
-            boolean isValid = verifyWebhookSignture(svixId, svixTimestamp, svixSignature, payload);
+            boolean isValid = verifyWebhookSignature(svixId, svixTimestamp, svixSignature, payload);
             if (!isValid) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid webhook signature");
             }
+
             ObjectMapper mapper = new ObjectMapper();
             JsonNode rootNode = mapper.readTree(payload);
 
@@ -49,20 +50,20 @@ public class ClerkWebhookController {
                     break;
             }
             return ResponseEntity.ok().build();
-        } catch (Exception e) {
+        }catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
         }
     }
 
     private void handleUserDeleted(JsonNode data) {
         String clerkId = data.path("id").asText();
-
         profileService.deleteProfile(clerkId);
     }
 
     private void handleUserUpdated(JsonNode data) {
         String clerkId = data.path("id").asText();
 
+        // Extract user information
         String email = "";
         JsonNode emailAddresses = data.path("email_addresses");
         if (emailAddresses.isArray() && emailAddresses.size() > 0) {
@@ -75,9 +76,9 @@ public class ClerkWebhookController {
 
         ProfileDTO updatedProfile = ProfileDTO.builder()
                 .clerkId(clerkId)
-                .email(email)
                 .firstName(firstName)
                 .lastName(lastName)
+                .email(email)
                 .photoUrl(photoUrl)
                 .build();
 
@@ -86,6 +87,7 @@ public class ClerkWebhookController {
         if (updatedProfile == null) {
             handleUserCreated(data);
         }
+
     }
 
     private void handleUserCreated(JsonNode data) {
@@ -103,9 +105,9 @@ public class ClerkWebhookController {
 
         ProfileDTO newProfile = ProfileDTO.builder()
                 .clerkId(clerkId)
-                .email(email)
                 .firstName(firstName)
                 .lastName(lastName)
+                .email(email)
                 .photoUrl(photoUrl)
                 .build();
 
@@ -113,7 +115,7 @@ public class ClerkWebhookController {
         userCreditsService.createInitialCredits(clerkId);
     }
 
-    private boolean verifyWebhookSignture(String svixId, String svixTimestamp, String svixSignature, String payload) {
+    private boolean verifyWebhookSignature(String svixId, String svixTimestamp, String svixSignature, String payload) {
         return true;
     }
 }
