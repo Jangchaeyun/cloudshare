@@ -31,4 +31,21 @@ public class UserCreditsService {
         String clerkId = profileService.getCurrentProfile().getClerkId();
         return getUserCredits(clerkId);
     }
+
+    public Boolean hasEnoughCredits(int requiredCredits) {
+        UserCredits userCredits = getUserCredits();
+        return userCredits.getCredits() >= requiredCredits;
+    }
+
+    public UserCredits consumeCredit() {
+        UserCredits userCredits = getUserCredits();
+
+        if (userCredits.getCredits() <= 0) {
+            return null;
+        }
+
+        userCredits.setCredits(userCredits.getCredits() - 1);
+        return userCreditsRepository.save(userCredits);
+
+    }
 }
