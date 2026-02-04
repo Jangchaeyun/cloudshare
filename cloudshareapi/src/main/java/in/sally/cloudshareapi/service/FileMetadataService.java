@@ -18,6 +18,7 @@ import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -41,7 +42,7 @@ public class FileMetadataService {
         Files.createDirectories(uploadPath);
 
         for (MultipartFile file : files) {
-            String fileName = UUID.randomUUID() + "." + StringUtils.getFilename(file.getOriginalFilename());
+            String fileName = UUID.randomUUID() + "." + StringUtils.getFilenameExtension(file.getOriginalFilename());
             Path targetLocation = uploadPath.resolve(fileName);
             Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
 
@@ -75,5 +76,22 @@ public class FileMetadataService {
                 .isPublic(fileMetadataDocument.getIsPublic())
                 .uploadedAt(fileMetadataDocument.getUploadedAt())
                 .build();
+    }
+
+    public List<FileMetadataDTO> getFiles() {
+        ProfileDocument currentProfile = profileService.getCurrentProfile();
+        List<FileMetadataDocument> files = fileMetadataRepository.findByClerkId(currentProfile.getClerkId());
+        return files.stream().map(this::mapToDTO).collect(Collectors.toList());
+    }
+
+    public FileMetadataDTO getPublicFile(String id) {
+        Optional<FileMetadataDocument> fileOptional = fileMetadataRepository.findById(id);
+
+        if (fileOptional.isEmpty() || !fileOptional.get().getIsPublic()) {
+            throw new RuntimeException("Unable to get the file");
+        }
+
+        FileMetadataDocument document = fileOptional.get();
+        return mapToDTO(document);
     }
 }
