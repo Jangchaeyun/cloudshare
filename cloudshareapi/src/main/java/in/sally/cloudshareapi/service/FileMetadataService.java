@@ -2,7 +2,6 @@ package in.sally.cloudshareapi.service;
 
 import in.sally.cloudshareapi.document.FileMetadataDocument;
 import in.sally.cloudshareapi.document.ProfileDocument;
-import in.sally.cloudshareapi.document.UserCredits;
 import in.sally.cloudshareapi.dto.FileMetadataDTO;
 import in.sally.cloudshareapi.repository.FileMetadataRepository;
 import lombok.RequiredArgsConstructor;
@@ -93,5 +92,19 @@ public class FileMetadataService {
 
         FileMetadataDocument document = fileOptional.get();
         return mapToDTO(document);
+    }
+
+    public FileMetadataDTO getDownloadedFile(String id) {
+        FileMetadataDocument file = fileMetadataRepository.findById(id).orElseThrow(() -> new RuntimeException("File not found"));
+        return mapToDTO(file);
+    }
+
+    public void deleteFile(String id) {
+        try {
+            ProfileDocument currentProfile = profileService.getCurrentProfile();
+            FileMetadataDocument file = fileMetadataRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("file not found"));
+        } catch (Exception e) {
+        }
     }
 }
