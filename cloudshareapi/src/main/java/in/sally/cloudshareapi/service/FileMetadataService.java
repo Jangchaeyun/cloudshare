@@ -104,7 +104,25 @@ public class FileMetadataService {
             ProfileDocument currentProfile = profileService.getCurrentProfile();
             FileMetadataDocument file = fileMetadataRepository.findById(id)
                     .orElseThrow(() -> new RuntimeException("file not found"));
+            if (!file.getClerkId().equals(currentProfile.getClerkId())) {
+                throw new RuntimeException("File is not belong to current user");
+            }
+
+            Path filePath = Paths.get(file.getFileLocation());
+            Files.deleteIfExists(filePath);
+
+            fileMetadataRepository.deleteById(id);
         } catch (Exception e) {
+            throw new RuntimeException("Error deleting the file");
         }
+    }
+
+    public FileMetadataDTO togglePublic(String id) {
+        FileMetadataDocument file = fileMetadataRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("File not found"));
+
+        file.setIsPublic(!file.getIsPublic());
+        fileMetadataRepository.save(file);
+        return mapToDTO(file);
     }
 }

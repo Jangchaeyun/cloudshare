@@ -64,4 +64,16 @@ public class FileController {
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + downloadedFile.getName() + "\"")
                 .body(resource);
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteFile(@PathVariable String id) {
+        fileMetadataService.deleteFile(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{id}/toggle-public")
+    public ResponseEntity<?> togglePublic(@PathVariable String id) {
+        FileMetadataDTO file = fileMetadataService.togglePublic(id);
+        return ResponseEntity.ok(file);
+    }
 }
