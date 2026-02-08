@@ -1,10 +1,21 @@
 import { useEffect, useState } from "react";
 import DashboardLayout from "../layout/DashboardLayout";
-import { Copy, Download, File, Globe, Grid, List, Lock } from "lucide-react";
+import {
+  Copy,
+  Download,
+  Eye,
+  File,
+  Globe,
+  Grid,
+  List,
+  Lock,
+  Trash2,
+} from "lucide-react";
 import { useAuth } from "@clerk/clerk-react";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import FileCard from "../components/FileCard";
 
 const MyFiles = () => {
   const [files, setFiles] = useState([]);
@@ -71,7 +82,11 @@ const MyFiles = () => {
             </button>
           </div>
         ) : viewMode === "grid" ? (
-          <div>Grid view</div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {files.map((file) => (
+              <FileCard key={file.id} file={file} />
+            ))}
+          </div>
         ) : (
           <div className="overflow-x-auto bg-white rounded-lg shadow">
             <table className="min-w-full">
@@ -115,7 +130,7 @@ const MyFiles = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                       <div className="flex items-center gap-4">
                         <button className="flex items-center gap-2 cursor-pointer group">
-                          {file.public ? (
+                          {file.isPublic ? (
                             <>
                               <Globe size={16} className="text-green-500" />
                               <span className="group-hover:underline">
@@ -131,7 +146,7 @@ const MyFiles = () => {
                             </>
                           )}
                         </button>
-                        {file.public && (
+                        {file.isPublic && (
                           <button className="flex items-center gap-2 cursor-pointer group text-blue-600">
                             <Copy size={16} />
                             <span className="group-hover:underline">
@@ -150,6 +165,26 @@ const MyFiles = () => {
                           >
                             <Download size={18} />
                           </button>
+                        </div>
+                        <div className="flex justify-center">
+                          <button
+                            title="삭제"
+                            className="text-gray-500 hover:text-red-600"
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                        </div>
+                        <div className="flex justify-center">
+                          {file.isPublic ? (
+                            <Link
+                              to={`/file/${file.id}`}
+                              className="text-gray-500 hover:text-blue-600"
+                            >
+                              <Eye size={18} />
+                            </Link>
+                          ) : (
+                            <span className="w-[18px]"></span>
+                          )}
                         </div>
                       </div>
                     </td>
