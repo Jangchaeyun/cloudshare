@@ -41,6 +41,53 @@ const MyFiles = () => {
     }
   };
 
+  // Toggles the public/private status of a file
+  const togglePublic = async (fileToUpdate) => {
+    try {
+      const token = await getToken();
+      await axios.patch(
+        `http://localhost:8080/api/v1.0/files/${fileToUpdate.id}/toggle-public`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+      setFiles(
+        files.map((file) =>
+          file.id === fileToUpdate.id
+            ? { ...file, public: !file.isPublic }
+            : file,
+        ),
+      );
+    } catch (error) {
+      console.error("Error toggling file status", error);
+      toast.error(
+        "파일 상태를 변경하는 중에 오류가 발생했습니다.",
+        error.message,
+      );
+    }
+  };
+
+  const getFileIcon = (file) => {
+    const extenstion = file.name.split(".").pop().toLowerCase();
+
+    if (["jpg", "jpeg", "png", "gif", "svg", "webp"].includes(extenstion)) {
+      return <Image size={24} className="text-purple-500" />;
+    }
+
+    if (["mp4", "webm", "mov", "avi", "mkv"].includes(extenstion)) {
+      return <Video size={24} className="text-blue-500" />;
+    }
+
+    if (["mp3", "wav", "ogg", "flac", "m4a"].includes(extenstion)) {
+      return <Music size={24} className="text-green-500" />;
+    }
+
+    if (["pdf", "doc", "docx", "txt", "rtf"].includes(extenstion)) {
+      return <FileText size={24} className="text-amber-500" />;
+    }
+
+    return <FileIcon size={24} className="text-purple-500" />;
+  };
+
   useEffect(() => {
     fetchFiles();
   }, [getToken]);
@@ -117,7 +164,7 @@ const MyFiles = () => {
                   >
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">
                       <div className="flex items-center gap-2">
-                        <File size={20} className="text-blue-600" />
+                        {getFileIcon(file)}
                         {file.name}
                       </div>
                     </td>
@@ -129,7 +176,10 @@ const MyFiles = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                       <div className="flex items-center gap-4">
-                        <button className="flex items-center gap-2 cursor-pointer group">
+                        <button
+                          onClick={() => navigate("/upload")}
+                          className="flex items-center gap-2 cursor-pointer group"
+                        >
                           {file.isPublic ? (
                             <>
                               <Globe size={16} className="text-green-500" />
@@ -176,12 +226,15 @@ const MyFiles = () => {
                         </div>
                         <div className="flex justify-center">
                           {file.isPublic ? (
-                            <Link
-                              to={`/file/${file.id}`}
+                            <a
+                              href={`/file/${file.id}`}
+                              title="파일 보기"
+                              target="_blank"
+                              rel="noreferrer"
                               className="text-gray-500 hover:text-blue-600"
                             >
                               <Eye size={18} />
-                            </Link>
+                            </a>
                           ) : (
                             <span className="w-[18px]"></span>
                           )}
