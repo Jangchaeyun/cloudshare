@@ -7,6 +7,7 @@ import {
   File,
   Globe,
   Grid,
+  Image,
   List,
   Lock,
   Trash2,
@@ -14,8 +15,9 @@ import {
 import { useAuth } from "@clerk/clerk-react";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import FileCard from "../components/FileCard";
+import { apiEndpoints } from "../util/apiEndpoints";
 
 const MyFiles = () => {
   const [files, setFiles] = useState([]);
@@ -46,14 +48,14 @@ const MyFiles = () => {
     try {
       const token = await getToken();
       await axios.patch(
-        `http://localhost:8080/api/v1.0/files/${fileToUpdate.id}/toggle-public`,
+        apiEndpoints.TOGGLE_FILES(fileToUpdate.id),
         {},
         { headers: { Authorization: `Bearer ${token}` } },
       );
       setFiles(
         files.map((file) =>
           file.id === fileToUpdate.id
-            ? { ...file, public: !file.isPublic }
+            ? { ...file, isPublic: !file.isPublic }
             : file,
         ),
       );
@@ -86,6 +88,30 @@ const MyFiles = () => {
     }
 
     return <FileIcon size={24} className="text-purple-500" />;
+  };
+
+  // handle file download
+  const handleDownload = async (file) => {
+    try {
+      const token = await getToken();
+      const response = await axios.get(apiEndpoints.DOWNLOAD_FILE(file.id), {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", file.name);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Download faild", error);
+      toast.error("파일 다운로드 중 오류가 발생했습니다.", error.message);
+    }
   };
 
   useEffect(() => {
@@ -177,7 +203,7 @@ const MyFiles = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                       <div className="flex items-center gap-4">
                         <button
-                          onClick={() => navigate("/upload")}
+                          onClick={() => togglePublic(file)}
                           className="flex items-center gap-2 cursor-pointer group"
                         >
                           {file.isPublic ? (
@@ -210,6 +236,7 @@ const MyFiles = () => {
                       <div className="grid grid-cols-3 gap-4">
                         <div className="flex justify-center">
                           <button
+                            onClick={() => handleDownload(file)}
                             title="다운로드"
                             className="text-gray-500 hover:text-green-600"
                           >
