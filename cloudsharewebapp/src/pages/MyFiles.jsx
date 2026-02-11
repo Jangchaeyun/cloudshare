@@ -18,12 +18,17 @@ import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import FileCard from "../components/FileCard";
 import { apiEndpoints } from "../util/apiEndpoints";
+import ConfirmationDialog from "../components/ConfirmationDialog";
 
 const MyFiles = () => {
   const [files, setFiles] = useState([]);
   const [viewMode, setViewMode] = useState("list");
   const { getToken } = useAuth();
   const navigate = useNavigate();
+  const [deleteConfirmation, setDeleteConfirmation] = useState({
+    isOpen: false,
+    fileId: null,
+  });
 
   const fetchFiles = async () => {
     try {
@@ -98,6 +103,7 @@ const MyFiles = () => {
         headers: {
           Authorization: `Bearer ${token}`,
         },
+        responseType: "blob",
       });
 
       const url = window.URL.createObjectURL(new Blob([response.data]));
@@ -112,6 +118,14 @@ const MyFiles = () => {
       console.error("Download faild", error);
       toast.error("파일 다운로드 중 오류가 발생했습니다.", error.message);
     }
+  };
+
+  // Closes the delete confirm
+  const closeDeleteConfirmation = () => {
+    setDeleteConfirmation({
+      isOpen: false,
+      fileId: null,
+    });
   };
 
   useEffect(() => {
@@ -274,6 +288,17 @@ const MyFiles = () => {
             </table>
           </div>
         )}
+        {/* Delete confirmation dialog */}
+        <ConfirmationDialog
+          isOpen={deleteConfirmation.isOpen}
+          onClose={closeDeleteConfirmation}
+          title="파일 삭제"
+          message="이 파일을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다."
+          confirmText="삭제"
+          cancelText="취소"
+          onConfirm={handleDelete}
+          confirmationButtonClass="bg-red-600 hover:bg-red-700"
+        />
       </div>
     </DashboardLayout>
   );
