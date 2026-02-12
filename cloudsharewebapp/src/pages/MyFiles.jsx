@@ -30,6 +30,12 @@ const MyFiles = () => {
     fileId: null,
   });
 
+  const [shareModal, setShareModal] = useState({
+    isOpen: false,
+    filesId: null,
+    link: "",
+  });
+
   const fetchFiles = async () => {
     try {
       const token = await getToken();
@@ -126,6 +132,46 @@ const MyFiles = () => {
       isOpen: false,
       fileId: null,
     });
+  };
+
+  // Opens the delete confirmation modal
+  const openDeleteConfirmation = (fileId) => {
+    setDeleteConfirmation({
+      isOpen: true,
+      fileId,
+    });
+  };
+
+  // opens the shadow link modal
+  const openShareModal = (fileId) => {
+    const link = `${window.location.origin}/file/${fileId}`;
+    setShareModal({
+      isOpen: true,
+      fileId,
+      link,
+    });
+  };
+
+  // Delete a file after confirmation
+  const handleDelete = async () => {
+    const fileId = deleteConfirmation.fileId;
+    if (!fileId) return;
+
+    try {
+      const token = await getToken();
+      const response = axios.delete(apiEndpoints.DELETE_FILE(fileId), {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (response.status === 204) {
+        setFiles(files.filter((file) => file.id !== fileId));
+        closeDeleteConfirmation();
+      } else {
+        toast.error("파일 삭제 시 오류 발생");
+      }
+    } catch (error) {
+      console.error("Error deleting file", error);
+      toast.error("파일 삭제 시 오류 발생", error.message);
+    }
   };
 
   useEffect(() => {
@@ -259,6 +305,7 @@ const MyFiles = () => {
                         </div>
                         <div className="flex justify-center">
                           <button
+                            onClick={() => openDeleteConfirmation(file.id)}
                             title="삭제"
                             className="text-gray-500 hover:text-red-600"
                           >
