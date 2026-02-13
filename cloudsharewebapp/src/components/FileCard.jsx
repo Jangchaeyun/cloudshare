@@ -13,7 +13,13 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 
-const FileCard = ({ file }) => {
+const FileCard = ({
+  file,
+  onDelete,
+  onTogglePublic,
+  onDownload,
+  onShareLink,
+}) => {
   const [showActions, setShowActions] = useState(false);
   const getFileIcon = (file) => {
     const extenstion = file.name.split(".").pop().toLowerCase();
@@ -95,6 +101,7 @@ const FileCard = ({ file }) => {
         <div className="flex gap-3 w-full justify-center">
           {file.isPublic && (
             <button
+              onClick={() => onShareLink(file.id)}
               title="공유 링크"
               className="p-2 bg-white/90 rounded-full hover:bg-white transition-colors text-purple-500 hover:text-purple-600"
             >
@@ -115,6 +122,7 @@ const FileCard = ({ file }) => {
           )}
 
           <button
+            onClick={() => onDownload(file)}
             title="다운로드"
             className="p-2 bg-white/90 rounded-full hover:bg-white transition-colors text-green-600 hover:text-green-700"
           >
@@ -122,6 +130,7 @@ const FileCard = ({ file }) => {
           </button>
 
           <button
+            onClick={() => onTogglePublic(file)}
             title={file.isPublic ? "비공개로 전환" : "공개로 전환"}
             className="p-2 bg-white/90 rounded-full hover:bg-white transition-colors text-amber-600 hover:text-amber-700"
           >
@@ -129,6 +138,7 @@ const FileCard = ({ file }) => {
           </button>
 
           <button
+            onClick={() => onDelete(file.id)}
             title="삭제"
             className="p-2 bg-white/90 rounded-full hover:bg-white transition-colors text-red-600 hover:text-red-700"
           >

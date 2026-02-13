@@ -19,6 +19,7 @@ import { useNavigate } from "react-router-dom";
 import FileCard from "../components/FileCard";
 import { apiEndpoints } from "../util/apiEndpoints";
 import ConfirmationDialog from "../components/ConfirmationDialog";
+import LinkShareModal from "../components/LinkShareModal";
 
 const MyFiles = () => {
   const [files, setFiles] = useState([]);
@@ -152,6 +153,14 @@ const MyFiles = () => {
     });
   };
 
+  const closeShareModal = () => {
+    setShareModal({
+      isOpen: false,
+      fileId: null,
+      link: "",
+    });
+  };
+
   // Delete a file after confirmation
   const handleDelete = async () => {
     const fileId = deleteConfirmation.fileId;
@@ -217,7 +226,14 @@ const MyFiles = () => {
         ) : viewMode === "grid" ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {files.map((file) => (
-              <FileCard key={file.id} file={file} />
+              <FileCard
+                key={file.id}
+                file={file}
+                onDelete={openDeleteConfirmation}
+                onTogglePublic={togglePublic}
+                onDownload={handleDownload}
+                onShareLink={openShareModal}
+              />
             ))}
           </div>
         ) : (
@@ -283,7 +299,10 @@ const MyFiles = () => {
                           )}
                         </button>
                         {file.isPublic && (
-                          <button className="flex items-center gap-2 cursor-pointer group text-blue-600">
+                          <button
+                            onClick={() => openShareModal(file.id)}
+                            className="flex items-center gap-2 cursor-pointer group text-blue-600"
+                          >
                             <Copy size={16} />
                             <span className="group-hover:underline">
                               링크 공유
@@ -345,6 +364,14 @@ const MyFiles = () => {
           cancelText="취소"
           onConfirm={handleDelete}
           confirmationButtonClass="bg-red-600 hover:bg-red-700"
+        />
+
+        {/* Share link modal */}
+        <LinkShareModal
+          isOpen={shareModal.isOpen}
+          onClose={closeShareModal}
+          link={shareModal.link}
+          title="링크 공유"
         />
       </div>
     </DashboardLayout>
