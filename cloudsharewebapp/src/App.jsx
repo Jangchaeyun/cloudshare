@@ -7,11 +7,11 @@ import Subscription from "./pages/Subscription";
 import Transactions from "./pages/Transactions";
 import { RedirectToSignIn, SignedIn, SignedOut } from "@clerk/clerk-react";
 import { Toaster } from "react-hot-toast";
-import { UserCreditsContext } from "./context/UserCreditsContext";
+import { UserCreditsProvide } from "./context/UserCreditsContext";
 
 const App = () => {
   return (
-    <UserCreditsContext>
+    <UserCreditsProvide>
       <BrowserRouter>
         <Toaster />
         <Routes>
@@ -84,7 +84,7 @@ const App = () => {
           <Route path="/*" element={<RedirectToSignIn />} />
         </Routes>
       </BrowserRouter>
-    </UserCreditsContext>
+    </UserCreditsProvide>
   );
 };
 

@@ -1,8 +1,8 @@
 import { useAuth } from "@clerk/clerk-react";
 import axios from "axios";
 import { apiEndpoints } from "../util/apiEndpoints";
-
-const { createContext, useState, useCallback } = require("react");
+import { createContext, useState, useCallback, useEffect } from "react";
+import toast from "react-hot-toast";
 
 export const UserCreditsContext = createContext();
 
@@ -22,7 +22,11 @@ export const UserCreditsProvide = ({ children }) => {
       const response = await axios.get(apiEndpoints.GET_CREDITS, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setCredits(response.data);
+      if (response.status === 200) {
+        setCredits(response.data.credits);
+      } else {
+        toast.error("크레딧을 얻을 수 없습니다.");
+      }
     } catch (error) {
       console.error("Error fetching the user credits", error);
     } finally {
@@ -30,7 +34,21 @@ export const UserCreditsProvide = ({ children }) => {
     }
   }, [getToken, isSignedIn]);
 
-  const contextValue = {};
+  useEffect(() => {
+    if (isSignedIn) fetchUserCredits();
+  }, [fetchUserCredits, isSignedIn]);
+
+  const updateCredits = useCallback((newCredits) => {
+    console.log("Updating the credits", newCredits);
+    setCredits(newCredits);
+  }, []);
+
+  const contextValue = {
+    credits,
+    setCredits,
+    fetchUserCredits,
+    updateCredits,
+  };
   return (
     <UserCreditsContext.Provider value={contextValue}>
       {children}
