@@ -2,6 +2,11 @@ import { useContext, useState } from "react";
 import DashboardLayout from "../layout/DashboardLayout";
 import { useAuth } from "@clerk/clerk-react";
 import { AlertCircle } from "lucide-react";
+import axios from "axios";
+import { apiEndpoints } from "../util/apiEndpoints";
+import toast from "react-hot-toast";
+import UploadBox from "../components/UploadBox";
+import { UserCreditsContext } from "../context/UserCreditsContext";
 
 const Upload = () => {
   const [files, setFiles] = useState([]);
@@ -9,7 +14,7 @@ const Upload = () => {
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("");
   const { getToken } = useAuth();
-  const { credits, setCredits } = useContext();
+  const { credits, setCredits } = useContext(UserCreditsContext);
   const MAX_FILES = 5;
 
   const handleFileChange = (e) => {
@@ -22,7 +27,7 @@ const Upload = () => {
     }
 
     // add the new files into the existing files
-    setFiles((prevFiles) => [...prevFiles, selectedFiles]);
+    setFiles((prevFiles) => [...prevFiles, ...selectedFiles]);
     setMessage("");
     setMessageType("");
   };
@@ -41,6 +46,43 @@ const Upload = () => {
     }
 
     if (files.length > MAX_FILES) {
+      setMessage(`한 번에 최대 ${MAX_FILES}개의 파일만 업로드할 수 있습니다.`);
+      setMessageType("error");
+      return;
+    }
+
+    setUploading(true);
+    setMessage("파일 업로드 중...");
+    setMessageType("info");
+
+    const formData = new FormData();
+    files.forEach((file) => formData.append("files", file));
+
+    try {
+      const token = await getToken();
+      const response = await axios.post(apiEndpoints.UPLOAD_FILE, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.data && response.data.remainingCredits !== undefined) {
+        setCredits(response.data.remainingCredits);
+      }
+
+      setMessage("파일이 성공적으로 업로드되었습니다.");
+      setMessageType("success");
+      setFiles([]);
+    } catch (error) {
+      console.error("Error uploading files: ", error);
+      toast.error("Error uploading files: ", error.message);
+      setMessage(
+        error.response?.data?.message ||
+          "파일 업로드 중 오류가 발생했습니다. 다시 시도해 주세요.",
+      );
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -62,14 +104,14 @@ const Upload = () => {
           </div>
         )}
 
-        <Upload
+        <UploadBox
           files={files}
           onFileChange={handleFileChange}
           onUpload={handleUpload}
           uploading={uploading}
           onRemoveFile={handleRemoveFile}
           remainingCredits={credits}
-          isUploadDisable={isUploadDisable}
+          isUploadDisabled={isUploadDisabled}
         />
       </div>
     </DashboardLayout>
