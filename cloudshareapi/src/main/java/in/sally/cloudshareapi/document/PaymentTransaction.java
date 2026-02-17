@@ -25,4 +25,6 @@ public class PaymentTransaction {
     private String status;
     private LocalDateTime transactionDate;
 
+    private String userEmail;
+    private String userName;
 }

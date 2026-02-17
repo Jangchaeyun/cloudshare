@@ -1,12 +1,17 @@
 package in.sally.cloudshareapi.service;
 
+import com.razorpay.Order;
 import com.razorpay.RazorpayClient;
+import in.sally.cloudshareapi.document.PaymentTransaction;
 import in.sally.cloudshareapi.document.ProfileDocument;
 import in.sally.cloudshareapi.dto.PaymentDTO;
 import in.sally.cloudshareapi.repository.PaymentTransactionRepository;
 import lombok.RequiredArgsConstructor;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +31,27 @@ public class PaymentService {
             ProfileDocument currentProfile = profileService.getCurrentProfile();
             String clerkId = currentProfile.getClerkId();
 
+            RazorpayClient razorpayClient = new RazorpayClient(razorpayKeyId, razorpayKeySecret);
+
+            JSONObject orderRequest = new JSONObject();
+            orderRequest.put("amount", paymentDTO.getAmount());
+            orderRequest.put("currency", paymentDTO.getCurrency());
+            orderRequest.put("receipt", "order_" + System.currentTimeMillis());
+
+            Order order = razorpayClient.orders.create(orderRequest);
+            String orderId = order.get("id");
+
+            PaymentTransaction transaction = PaymentTransaction.builder()
+                    .clerkId(clerkId)
+                    .orderId(orderId)
+                    .planId(paymentDTO.getPlanId())
+                    .amount(paymentDTO.getAmount())
+                    .currency(paymentDTO.getCurrency())
+                    .status("PENDING")
+                    .transactionDate(LocalDateTime.now())
+                    .userEmail(currentProfile.getEmail())
+                    .userName(currentProfile.getFirstName() + " " + currentProfile.getLastName())
+                    .build();
         } catch (Exception e) {
 
         }
