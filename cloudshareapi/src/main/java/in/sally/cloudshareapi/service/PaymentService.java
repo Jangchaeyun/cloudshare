@@ -52,8 +52,19 @@ public class PaymentService {
                     .userEmail(currentProfile.getEmail())
                     .userName(currentProfile.getFirstName() + " " + currentProfile.getLastName())
                     .build();
-        } catch (Exception e) {
 
+            paymentTransactionRepository.save(transaction);
+
+            return PaymentDTO.builder()
+                    .orderId(orderId)
+                    .success(true)
+                    .message("Order created successfully")
+                    .build();
+        } catch (Exception e) {
+            return PaymentDTO.builder()
+                    .success(false)
+                    .message("Error creating order: " + e.getMessage())
+                    .build();
         }
     }
 }
